@@ -1,0 +1,224 @@
+{
+  "events": [
+    {
+      "eventId": "event-1778128416564",
+      "name": "SPOT",
+      "date": "2026-05-07",
+      "location": "Mandala",
+      "price": 15000,
+      "status": "active",
+      "createdAt": "2026-05-07T04:33:36.564Z"
+    },
+    {
+      "eventId": "event-1778068231741",
+      "name": "ANOMALI",
+      "date": "2026-05-06",
+      "location": "MUGAR",
+      "price": 15000,
+      "status": "active",
+      "createdAt": "2026-05-06T11:50:31.741Z"
+    },
+    {
+      "eventId": "event-1778065749193",
+      "name": "Wisuda",
+      "date": "2026-05-06",
+      "location": "Unsil",
+      "price": 15000,
+      "status": "active",
+      "createdAt": "2026-05-06T11:09:09.193Z"
+    },
+    {
+      "eventId": "event-1774353862942",
+      "name": "Ulang Tahun Dzikra",
+      "date": "2026-04-12",
+      "location": "Cimahi",
+      "price": 15000,
+      "status": "active",
+      "createdAt": "2026-03-24T12:04:22.942Z"
+    }
+  ],
+  "photos": [
+    {
+      "id": "1774353883733",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353883721-276523741.jpeg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:04:43.733Z"
+    },
+    {
+      "id": "1774353922357",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353922349-332203623.jpg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:05:22.358Z"
+    },
+    {
+      "id": "1774353926654",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353926640-211775559.jpg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:05:26.655Z"
+    },
+    {
+      "id": "1774353929869",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353929852-439779410.jpg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:05:29.869Z"
+    },
+    {
+      "id": "1774353932737",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353932724-724763035.jpg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:05:32.737Z"
+    },
+    {
+      "id": "1774353939401",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353939375-121143560.jpg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:05:39.402Z"
+    },
+    {
+      "id": "1774353942669",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353942557-204231569.jpg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:05:42.669Z"
+    },
+    {
+      "id": "1774353945439",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353945399-693544102.jpg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:05:45.439Z"
+    },
+    {
+      "id": "1774353949366",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353949354-537374741.jpg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:05:49.366Z"
+    },
+    {
+      "id": "1774353962032",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353962024-681564282.jpeg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:06:02.033Z"
+    },
+    {
+      "id": "1774353966205",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353966201-570831860.jpeg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:06:06.205Z"
+    },
+    {
+      "id": "1774353969779",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774353969769-685236403.jpeg",
+      "price": 15000,
+      "watermark": true,
+      "faceEmbeddings": [],
+      "createdAt": "2026-03-24T12:06:09.780Z"
+    },
+    {
+      "id": "1774449000582",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774449000558-638308181.jpg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-03-25T14:30:00.582Z"
+    },
+    {
+      "id": "1774450538981",
+      "eventId": "event-1774353862942",
+      "url": "http://localhost:4000/uploads/1774450538966-140415718.jpg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-03-25T14:55:38.981Z"
+    },
+    {
+      "id": "1778068248691",
+      "eventId": "event-1778068231741",
+      "url": "http://localhost:4000/uploads/1778068248677-653023008.jpg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-06T11:50:48.692Z"
+    },
+    {
+      "id": "1778068286003",
+      "eventId": "event-1778068231741",
+      "url": "http://localhost:4000/uploads/1778068286001-363988798.jpg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-06T11:51:26.004Z"
+    },
+    {
+      "id": "1778128443916",
+      "eventId": "event-1778128416564",
+      "url": "http://localhost:4000/uploads/1778128443837-31460656.JPG",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-07T04:34:03.917Z"
+    },
+    {
+      "id": "1778128480290",
+      "eventId": "event-1778128416564",
+      "url": "http://localhost:4000/uploads/1778128480196-868406564.JPG",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-07T04:34:40.292Z"
+    },
+    {
+      "id": "1778128499804",
+      "eventId": "event-1778128416564",
+      "url": "http://localhost:4000/uploads/1778128499738-564852628.JPG",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-07T04:34:59.804Z"
+    },
+    {
+      "id": "1778128516479",
+      "eventId": "event-1778128416564",
+      "url": "http://localhost:4000/uploads/1778128516315-203916607.jpeg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-07T04:35:16.480Z"
+    },
+    {
+      "id": "1778139345794",
+      "eventId": "event-1778128416564",
+      "url": "http://localhost:4000/uploads/1778139345789-833571106.jpg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-07T07:35:45.794Z"
+    }
+  ],
+  "transactions": [],
+  "withdrawals": []
+}
