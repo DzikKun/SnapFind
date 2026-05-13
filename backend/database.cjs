@@ -118,6 +118,52 @@ async function addPhotoToEvent(eventId, photoData) {
   }
 }
 
+function getUploadFilePath(photoUrl) {
+  try {
+    const parsedUrl = new URL(photoUrl);
+    return path.join(__dirname, 'uploads', path.basename(parsedUrl.pathname));
+  } catch (error) {
+    return path.join(__dirname, 'uploads', path.basename(photoUrl));
+  }
+}
+
+async function deleteEvent(eventId) {
+  try {
+    const db = readDb();
+    const eventIndex = db.events.findIndex(e => e.eventId === eventId);
+    if (eventIndex === -1) return null;
+
+    const [deletedEvent] = db.events.splice(eventIndex, 1);
+    const deletedPhotos = db.photos.filter(p => p.eventId === eventId);
+    db.photos = db.photos.filter(p => p.eventId !== eventId);
+    writeDb(db);
+
+    const deletedFiles = [];
+    const failedFiles = [];
+    for (const photo of deletedPhotos) {
+      const filePath = getUploadFilePath(photo.url);
+      try {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          deletedFiles.push(path.basename(filePath));
+        }
+      } catch (error) {
+        failedFiles.push({ file: path.basename(filePath), error: error.message });
+      }
+    }
+
+    return {
+      event: deletedEvent,
+      deletedPhotos: deletedPhotos.length,
+      deletedFiles: deletedFiles.length,
+      failedFiles,
+    };
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    throw error;
+  }
+}
+
 // REVISI: searchFaces versi JavaScript lama kita nonaktifkan 
 // karena sekarang proses dilakukan oleh match_engine.py (Python)
 async function searchFaces(faceDescriptor, eventId) {
@@ -148,6 +194,7 @@ module.exports = {
   getEvents,
   getEventById,
   createEvent,
+  deleteEvent,
   addPhotoToEvent,
   searchFaces,
   authenticateUser,

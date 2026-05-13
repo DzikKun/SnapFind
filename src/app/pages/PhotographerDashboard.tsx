@@ -9,6 +9,7 @@ import { Progress } from "../components/ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
+import { useRealtimeEvents } from "../hooks/useRealtimeEvents";
 import type { EventData } from "../types";
 
 export default function PhotographerDashboard() {
@@ -29,6 +30,19 @@ export default function PhotographerDashboard() {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  useRealtimeEvents({
+    onEventCreated: (event) => {
+      setEvents(prev => {
+        if (prev.some(item => item.eventId === event.eventId)) return prev;
+        return [event, ...prev];
+      });
+    },
+    onEventDeleted: ({ eventId, eventName }) => {
+      setEvents(prev => prev.filter(event => event.eventId !== eventId));
+      toast.info(`Event dihapus admin${eventName ? `: ${eventName}` : ""}`);
+    },
+  });
 
   const fetchEvents = async () => {
     try {

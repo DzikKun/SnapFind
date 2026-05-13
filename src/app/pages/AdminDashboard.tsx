@@ -1,13 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { Camera, Users, Image, CreditCard, TrendingUp, CheckCircle, XCircle, Clock, LogOut } from "lucide-react";
+import { Camera, Users, Image, TrendingUp, CheckCircle, XCircle, Clock, LogOut, Trash2, Loader2, MapPin, CalendarDays } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext";
-import type { Transaction, Withdrawal } from "../types";
+import { useRealtimeEvents } from "../hooks/useRealtimeEvents";
+import { API_BASE_URL, type EventData, type Transaction, type Withdrawal } from "../types";
 
 const initialTransactions: Transaction[] = [
   { id: "1", code: "#TRX-2025-0347", user: "Sarah Johnson", desc: '5 foto dari event "Wisuda Universitas 2025"', amount: "Rp 75.000", method: "QRIS", time: "2 menit lalu", status: "pending" },
@@ -25,6 +37,42 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState(initialTransactions);
   const [withdrawals, setWithdrawals] = useState(initialWithdrawals);
+  const [events, setEvents] = useState<EventData[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [deletingEventId, setDeletingEventId] = useState<string | null>(null);
+
+  const fetchEvents = async () => {
+    try {
+      setLoadingEvents(true);
+      const response = await fetch(`${API_BASE_URL}/api/events`);
+      if (!response.ok) throw new Error("Failed to fetch events");
+      const data: EventData[] = await response.json();
+      setEvents(data);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      toast.error("Gagal memuat daftar event");
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  useRealtimeEvents({
+    onEventCreated: (event) => {
+      setEvents(prev => {
+        if (prev.some(item => item.eventId === event.eventId)) return prev;
+        return [event, ...prev];
+      });
+      toast.success(`Event baru masuk: ${event.name}`);
+    },
+    onEventDeleted: ({ eventId, eventName }) => {
+      setEvents(prev => prev.filter(event => event.eventId !== eventId));
+      toast.info(`Event dihapus${eventName ? `: ${eventName}` : ""}`);
+    },
+  });
 
   const handleLogout = () => {
     logout();
@@ -51,8 +99,29 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteEvent = async (eventId: string) => {
+    try {
+      setDeletingEventId(eventId);
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
+        method: "DELETE",
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to delete event");
+      }
+      setEvents(prev => prev.filter(event => event.eventId !== eventId));
+      toast.success(`Event dihapus. ${result.deletedPhotos || 0} foto terkait ikut dihapus.`);
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      toast.error("Gagal menghapus event");
+    } finally {
+      setDeletingEventId(null);
+    }
+  };
+
   const pendingTransactions = transactions.filter(t => t.status === "pending").length;
   const pendingWithdrawals = withdrawals.filter(w => w.status === "pending").length;
+  const totalPhotos = events.reduce((sum, event) => sum + (event.foundCount || 0), 0);
 
   const getStatusBadge = (status: string) => {
     if (status === "pending") return <Badge className="bg-amber-100 text-amber-700">Pending</Badge>;
@@ -113,7 +182,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-purple-600">89</div>
-              <p className="text-xs text-gray-500 mt-1">152 total events</p>
+              <p className="text-xs text-gray-500 mt-1">{events.length} total events</p>
             </CardContent>
           </Card>
           <Card className="border-2 border-green-200">
@@ -123,8 +192,8 @@ export default function AdminDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">47,823</div>
-              <p className="text-xs text-gray-500 mt-1">98.5% indexed</p>
+              <div className="text-2xl font-bold text-green-600">{totalPhotos}</div>
+              <p className="text-xs text-gray-500 mt-1">foto tersimpan</p>
             </CardContent>
           </Card>
           <Card className="border-2 border-amber-200">
@@ -141,9 +210,10 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="transactions" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3">
+          <TabsList className="grid w-full max-w-3xl grid-cols-4">
             <TabsTrigger value="transactions">Transaksi</TabsTrigger>
             <TabsTrigger value="withdrawals">Withdrawal</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
             <TabsTrigger value="system">System</TabsTrigger>
           </TabsList>
 
@@ -189,6 +259,100 @@ export default function AdminDashboard() {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          {/* Events Tab */}
+          <TabsContent value="events" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Kelola Event</h2>
+              <Badge variant="outline" className="text-sm">
+                <Camera className="w-3 h-3 mr-1" />
+                {events.length} event
+              </Badge>
+            </div>
+
+            {loadingEvents ? (
+              <Card>
+                <CardContent className="p-8 flex items-center justify-center text-gray-600">
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Memuat event...
+                </CardContent>
+              </Card>
+            ) : events.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center text-gray-600">
+                  Belum ada event yang tersimpan.
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {events.map(event => (
+                  <Card key={event.eventId} className="border-l-4 border-l-blue-500">
+                    <CardContent className="p-4">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <Badge className="bg-blue-100 text-blue-700">{event.status}</Badge>
+                            <span className="text-sm text-gray-500">{event.eventId}</span>
+                          </div>
+                          <h4 className="font-semibold mb-2">{event.name}</h4>
+                          <div className="grid gap-2 text-sm text-gray-600 md:grid-cols-4">
+                            <div className="flex items-center gap-2">
+                              <CalendarDays className="w-4 h-4" />
+                              <span>{event.date}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="w-4 h-4" />
+                              <span>{event.location}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold text-gray-900">{event.foundCount || 0}</span> foto
+                            </div>
+                            <div>
+                              Rp {Number(event.price || 0).toLocaleString("id-ID")}
+                            </div>
+                          </div>
+                        </div>
+
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              disabled={deletingEventId === event.eventId}
+                            >
+                              {deletingEventId === event.eventId ? (
+                                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                              ) : (
+                                <Trash2 className="w-4 h-4 mr-1" />
+                              )}
+                              Hapus
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Hapus event ini?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Event "{event.name}" akan dihapus permanen bersama semua data foto dan file gambar yang terkait. Tindakan ini tidak dapat dibatalkan.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Batal</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-red-600 text-white hover:bg-red-700"
+                                onClick={() => handleDeleteEvent(event.eventId)}
+                              >
+                                Hapus Event
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           {/* Withdrawals Tab */}

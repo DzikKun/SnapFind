@@ -6,17 +6,19 @@ const url = require('url');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const {
     readDb,
     testConnection,
     getEvents,
     getEventById,
     createEvent,
+    deleteEvent,
     addPhotoToEvent,
     authenticateUser
 } = require('./database.cjs');
 
-const PYTHON_EXECUTABLE = process.env.PYTHON_EXECUTABLE || 'C:\\Users\\Astra\\AppData\\Local\\Programs\\Python\\Python311\\python.exe';
+const PYTHON_EXECUTABLE = process.env.PYTHON_EXECUTABLE || (process.platform === 'win32' ? 'python' : 'python3');
 
 const ALLOWED_ORIGINS = [
     'http://localhost:5173',
@@ -69,6 +71,36 @@ const upload = multer({
 });
 
 let faceApiLoaded = false;
+const realtimeClients = new Set();
+
+const sendWebSocketMessage = (socket, payload) => {
+    if (socket.destroyed) return;
+
+    const data = Buffer.from(JSON.stringify(payload));
+    let header;
+
+    if (data.length < 126) {
+        header = Buffer.from([0x81, data.length]);
+    } else if (data.length < 65536) {
+        header = Buffer.alloc(4);
+        header[0] = 0x81;
+        header[1] = 126;
+        header.writeUInt16BE(data.length, 2);
+    } else {
+        header = Buffer.alloc(10);
+        header[0] = 0x81;
+        header[1] = 127;
+        header.writeBigUInt64BE(BigInt(data.length), 2);
+    }
+
+    socket.write(Buffer.concat([header, data]));
+};
+
+const broadcastRealtimeEvent = (payload) => {
+    for (const client of realtimeClients) {
+        sendWebSocketMessage(client, payload);
+    }
+};
 
 const loadFaceApi = async() => {
     console.log('✅ Backend siap menerima face descriptor dari frontend');
@@ -145,6 +177,11 @@ const server = http.createServer(async(req, res) => {
             try {
                 const eventData = JSON.parse(body);
                 const newEvent = await createEvent(eventData);
+                broadcastRealtimeEvent({
+                    type: 'event:created',
+                    event: newEvent,
+                    message: `Event "${newEvent.name}" dibuat`,
+                });
                 res.statusCode = 201;
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify(newEvent));
@@ -156,6 +193,32 @@ const server = http.createServer(async(req, res) => {
             }
         });
         return;
+    }
+
+    if (method === 'DELETE' && pathname.startsWith('/api/events/') && !pathname.endsWith('/photos')) {
+        const eventId = pathname.split('/')[3];
+        try {
+            const result = await deleteEvent(eventId);
+            res.setHeader('Content-Type', 'application/json');
+            if (!result) {
+                res.statusCode = 404;
+                return res.end(JSON.stringify({ error: 'Event not found' }));
+            }
+            broadcastRealtimeEvent({
+                type: 'event:deleted',
+                eventId,
+                eventName: result.event?.name,
+                deletedPhotos: result.deletedPhotos || 0,
+                message: `Event "${result.event?.name || eventId}" dihapus`,
+            });
+            res.statusCode = 200;
+            return res.end(JSON.stringify({ message: 'Event deleted successfully', ...result }));
+        } catch (error) {
+            console.error('Error deleting event:', error);
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            return res.end(JSON.stringify({ error: 'Failed to delete event' }));
+        }
     }
 
     if (method === 'GET' && pathname.startsWith('/api/events/') && pathname.endsWith('/photos')) {
@@ -354,6 +417,48 @@ const server = http.createServer(async(req, res) => {
 });
 
 const PORT = 4000;
+
+server.on('upgrade', (req, socket) => {
+    const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost:4000'}`);
+    if (parsedUrl.pathname !== '/ws') {
+        socket.destroy();
+        return;
+    }
+
+    const websocketKey = req.headers['sec-websocket-key'];
+    if (!websocketKey) {
+        socket.destroy();
+        return;
+    }
+
+    const acceptKey = crypto
+        .createHash('sha1')
+        .update(`${websocketKey}258EAFA5-E914-47DA-95CA-C5AB0DC85B11`)
+        .digest('base64');
+
+    socket.write([
+        'HTTP/1.1 101 Switching Protocols',
+        'Upgrade: websocket',
+        'Connection: Upgrade',
+        `Sec-WebSocket-Accept: ${acceptKey}`,
+        '',
+        '',
+    ].join('\r\n'));
+
+    realtimeClients.add(socket);
+    sendWebSocketMessage(socket, { type: 'connection:ready' });
+
+    socket.on('data', (buffer) => {
+        const opcode = buffer[0] & 0x0f;
+        if (opcode === 0x8) {
+            realtimeClients.delete(socket);
+            socket.end();
+        }
+    });
+    socket.on('close', () => realtimeClients.delete(socket));
+    socket.on('error', () => realtimeClients.delete(socket));
+});
+
 server.listen(PORT, () => {
     console.log(`✅ Backend server running at http://localhost:${PORT}`);
     console.log(`📦 Connected to JSON database`);

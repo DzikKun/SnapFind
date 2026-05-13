@@ -1,6 +1,33 @@
 {
   "events": [
     {
+      "eventId": "event-1778593914764",
+      "name": "Lari Bareng Di Gasibu",
+      "date": "2026-05-12",
+      "location": "Bandung",
+      "price": 15000,
+      "status": "active",
+      "createdAt": "2026-05-12T13:51:54.769Z"
+    },
+    {
+      "eventId": "event-1778552965158",
+      "name": "tes",
+      "date": "2026-05-12",
+      "location": "Tasik",
+      "price": 15000,
+      "status": "active",
+      "createdAt": "2026-05-12T02:29:25.158Z"
+    },
+    {
+      "eventId": "event-1778472916244",
+      "name": "Piknik Kala Itu",
+      "date": "2026-05-11",
+      "location": "Tasikmalaya",
+      "price": 5000,
+      "status": "active",
+      "createdAt": "2026-05-11T04:15:16.244Z"
+    },
+    {
       "eventId": "event-1778128416564",
       "name": "SPOT",
       "date": "2026-05-07",
@@ -8,24 +35,6 @@
       "price": 15000,
       "status": "active",
       "createdAt": "2026-05-07T04:33:36.564Z"
-    },
-    {
-      "eventId": "event-1778068231741",
-      "name": "ANOMALI",
-      "date": "2026-05-06",
-      "location": "MUGAR",
-      "price": 15000,
-      "status": "active",
-      "createdAt": "2026-05-06T11:50:31.741Z"
-    },
-    {
-      "eventId": "event-1778065749193",
-      "name": "Wisuda",
-      "date": "2026-05-06",
-      "location": "Unsil",
-      "price": 15000,
-      "status": "active",
-      "createdAt": "2026-05-06T11:09:09.193Z"
     },
     {
       "eventId": "event-1774353862942",
@@ -163,22 +172,6 @@
       "createdAt": "2026-03-25T14:55:38.981Z"
     },
     {
-      "id": "1778068248691",
-      "eventId": "event-1778068231741",
-      "url": "http://localhost:4000/uploads/1778068248677-653023008.jpg",
-      "price": 15000,
-      "watermark": true,
-      "createdAt": "2026-05-06T11:50:48.692Z"
-    },
-    {
-      "id": "1778068286003",
-      "eventId": "event-1778068231741",
-      "url": "http://localhost:4000/uploads/1778068286001-363988798.jpg",
-      "price": 15000,
-      "watermark": true,
-      "createdAt": "2026-05-06T11:51:26.004Z"
-    },
-    {
       "id": "1778128443916",
       "eventId": "event-1778128416564",
       "url": "http://localhost:4000/uploads/1778128443837-31460656.JPG",
@@ -217,6 +210,38 @@
       "price": 15000,
       "watermark": true,
       "createdAt": "2026-05-07T07:35:45.794Z"
+    },
+    {
+      "id": "1778472993126",
+      "eventId": "event-1778472916244",
+      "url": "http://localhost:4000/uploads/1778472993088-101989357.jpg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-11T04:16:33.128Z"
+    },
+    {
+      "id": "1778472996709",
+      "eventId": "event-1778472916244",
+      "url": "http://localhost:4000/uploads/1778472996707-951465389.jpeg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-11T04:16:36.710Z"
+    },
+    {
+      "id": "1778476212387",
+      "eventId": "event-1778472916244",
+      "url": "http://localhost:4000/uploads/1778476212369-109728075.jpg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-11T05:10:12.387Z"
+    },
+    {
+      "id": "1778593937488",
+      "eventId": "event-1778593914764",
+      "url": "http://localhost:4000/uploads/1778593937455-250751793.jpeg",
+      "price": 15000,
+      "watermark": true,
+      "createdAt": "2026-05-12T13:52:17.490Z"
     }
   ],
   "transactions": [],
